@@ -1,8 +1,8 @@
 package imgopt
 
 import (
+	"errors"
 	"image"
-	_ "image/gif"
 	"image/jpeg"
 	"image/png"
 	"io"
@@ -17,6 +17,13 @@ func Optimize(r io.Reader, w io.Writer, max int, quality int) error {
 		return err
 	}
 
+	switch format {
+	case "jpeg":
+	case "png":
+	default:
+		return errors.New("unknown format")
+	}
+
 	if c.Width >= c.Height && c.Width > max {
 		c.Width, c.Height = calcSize(c.Width, c.Height, max)
 	} else if c.Height > max {
@@ -29,12 +36,7 @@ func Optimize(r io.Reader, w io.Writer, max int, quality int) error {
 		return err
 	}
 
-	switch format {
-	case "jpeg":
-		fallthrough
-	case "png":
-		img = resize.Resize(uint(c.Width), uint(c.Height), img, resize.Lanczos3)
-	}
+	img = resize.Resize(uint(c.Width), uint(c.Height), img, resize.Lanczos3)
 
 	switch format {
 	case "jpeg":
