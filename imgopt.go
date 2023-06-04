@@ -18,19 +18,9 @@ func Optimize(r io.Reader, w io.Writer, max int, quality int) error {
 	}
 
 	if c.Width >= c.Height && c.Width > max {
-		c.Height = int(
-			math.Round(
-				float64(c.Height) / float64(c.Width) * float64(max),
-			),
-		)
-		c.Width = max
+		c.Width, c.Height = calcSize(c.Width, c.Height, max)
 	} else if c.Height > max {
-		c.Width = int(
-			math.Round(
-				float64(c.Width) / float64(c.Height) * float64(max),
-			),
-		)
-		c.Height = max
+		c.Height, c.Width = calcSize(c.Height, c.Width, max)
 	}
 
 	r.(io.Seeker).Seek(0, io.SeekStart)
@@ -60,4 +50,16 @@ func Optimize(r io.Reader, w io.Writer, max int, quality int) error {
 	}
 
 	return nil
+}
+
+func calcSize(w int, h int, max int) (int, int) {
+	if w > max {
+		return max, int(
+			math.Round(
+				float64(h) / float64(w) * float64(max),
+			),
+		)
+	}
+
+	return w, h
 }
